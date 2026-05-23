@@ -2,6 +2,9 @@ FROM serversideup/php:8.3-fpm
 
 ENV PHP_OPCACHE_ENABLE=1
 ENV SESSION_SECURE_COOKIE=true
+ENV PORT=8000
+
+WORKDIR /var/www/html
 
 USER root
 
@@ -26,3 +29,7 @@ RUN npm ci \
 # Install PHP dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev \
     && rm -rf /var/www/html/.composer/cache
+
+EXPOSE 8000
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
