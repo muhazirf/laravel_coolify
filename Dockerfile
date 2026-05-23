@@ -1,34 +1,32 @@
 FROM serversideup/php:8.3-fpm-nginx
 
 ENV PHP_OPCACHE_ENABLE=1
+ENV SESSION_SECURE_COOKIE=true
+
+# Force Nginx to use /tmp for its log files (fully writeable by www-data)
+ENV NGINX_ERROR_LOG=/tmp/error.log
+ENV NGINX_ACCESS_LOG=/tmp/access.log
 
 USER root
 
-# 1. Install Node.js
+# Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update \
     && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Fix Nginx logging directory and permissions
-RUN mkdir -p /var/log/nginx /var/lib/nginx \
-    && touch /var/log/nginx/error.log /var/log/nginx/access.log \
-    && chown -R www-data:www-data /var/log/nginx /var/lib/nginx
-
 # Copy application files
 COPY --chown=www-data:www-data . /var/www/html
 
-# Switch to non-root user
+# Switch to non-root user for all remaining actions
 USER www-data
 
-# Install dependencies and build
+# Install dependencies and build assets
 RUN npm ci \
     && npm run build \
     && rm -rf /var/www/html/.npm
 
 # Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-
-# Remove composer cache
-RUN rm -rf /var/www/html/.composer/cache
+RUN composer install --no-interaction --optimize-autoloader --no-dev \
+    && rm -rf /var/www/html/.composer/cache
