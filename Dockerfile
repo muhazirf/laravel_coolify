@@ -4,12 +4,17 @@ ENV PHP_OPCACHE_ENABLE=1
 
 USER root
 
-# Install Node.js
+# 1. Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update \
     && apt-get install -y nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# 2. Fix Nginx logging directory and permissions
+RUN mkdir -p /var/log/nginx /var/lib/nginx \
+    && touch /var/log/nginx/error.log /var/log/nginx/access.log \
+    && chown -R www-data:www-data /var/log/nginx /var/lib/nginx
 
 # Copy application files
 COPY --chown=www-data:www-data . /var/www/html
