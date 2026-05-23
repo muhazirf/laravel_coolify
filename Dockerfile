@@ -6,8 +6,13 @@ ENV SESSION_SECURE_COOKIE=true
 # Force Nginx to log to the container streams so startup never depends on /var/log/nginx
 ENV NGINX_ERROR_LOG=/dev/stderr
 ENV NGINX_ACCESS_LOG=/dev/stdout
+ENV DISABLE_DEFAULT_CONFIG=true
 
 USER root
+
+# Copy the runtime Nginx configuration before application setup
+COPY nginx.conf /nginx.conf
+RUN ln -sf /nginx.conf /etc/nginx/nginx.conf
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
