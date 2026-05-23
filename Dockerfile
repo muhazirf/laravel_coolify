@@ -1,24 +1,9 @@
-FROM serversideup/php:8.3-fpm-nginx
+FROM serversideup/php:8.3-fpm
 
 ENV PHP_OPCACHE_ENABLE=1
 ENV SESSION_SECURE_COOKIE=true
 
-# Force Nginx to log to the container streams so startup never depends on /var/log/nginx
-ENV NGINX_ERROR_LOG=/dev/stderr
-ENV NGINX_ACCESS_LOG=/dev/stdout
-ENV DISABLE_DEFAULT_CONFIG=true
-
 USER root
-
-# Ensure the legacy Nginx log path exists so older or mounted configs
-# do not fail during startup.
-RUN mkdir -p /var/log/nginx \
-    && touch /var/log/nginx/error.log \
-    && chown -R www-data:www-data /var/log/nginx
-
-# Copy the runtime Nginx configuration before application setup
-COPY nginx.conf /nginx.conf
-RUN ln -sf /nginx.conf /etc/nginx/nginx.conf
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
