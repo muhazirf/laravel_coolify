@@ -10,6 +10,12 @@ ENV DISABLE_DEFAULT_CONFIG=true
 
 USER root
 
+# Ensure the legacy Nginx log path exists so older or mounted configs
+# do not fail during startup.
+RUN mkdir -p /var/log/nginx \
+    && touch /var/log/nginx/error.log \
+    && chown -R www-data:www-data /var/log/nginx
+
 # Copy the runtime Nginx configuration before application setup
 COPY nginx.conf /nginx.conf
 RUN ln -sf /nginx.conf /etc/nginx/nginx.conf
