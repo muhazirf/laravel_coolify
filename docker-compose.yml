@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   app:
-    image: 'ammezie/laravel-coolify:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - '.:/var/www/html'
     environment:
@@ -12,6 +14,8 @@ services:
       APP_ENV: '${APP_ENV}'
       APP_KEY: '${APP_KEY}'
       APP_DEBUG: '${APP_DEBUG}'
+      NGINX_ACCESS_LOG: "/dev/stdout"
+      NGINX_ERROR_LOG: "/dev/stderr"
       APP_TIMEZONE: '${APP_TIMEZONE}'
       APP_URL: '${APP_URL}'
       APP_LOCALE: '${APP_LOCALE}'
@@ -52,13 +56,17 @@ services:
       - mysql
 
   worker:
-    image: 'ammezie/laravel-coolify:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: ["php", "/var/www/html/artisan", "queue:work", "--tries=3"]
     volumes:
       - '.:/var/www/html'
     environment:
       PHP_FPM_POOL_NAME: "queue-worker"
       APP_NAME: '${APP_NAME}'
+      NGINX_ACCESS_LOG: "/dev/stdout"
+      NGINX_ERROR_LOG: "/dev/stderr"
       APP_ENV: '${APP_ENV}'
       APP_KEY: '${APP_KEY}'
       APP_DEBUG: '${APP_DEBUG}'

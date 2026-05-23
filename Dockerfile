@@ -3,9 +3,9 @@ FROM serversideup/php:8.3-fpm-nginx
 ENV PHP_OPCACHE_ENABLE=1
 ENV SESSION_SECURE_COOKIE=true
 
-# Force Nginx to use /tmp for its log files (fully writeable by www-data)
-ENV NGINX_ERROR_LOG=/tmp/error.log
-ENV NGINX_ACCESS_LOG=/tmp/access.log
+# Force Nginx to log to the container streams so startup never depends on /var/log/nginx
+ENV NGINX_ERROR_LOG=/dev/stderr
+ENV NGINX_ACCESS_LOG=/dev/stdout
 
 USER root
 
