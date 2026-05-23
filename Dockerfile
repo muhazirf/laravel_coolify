@@ -1,8 +1,9 @@
-FROM serversideup/php:8.3-fpm
+FROM serversideup/php:8.3-fpm-nginx
 
 ENV PHP_OPCACHE_ENABLE=1
 ENV SESSION_SECURE_COOKIE=true
-ENV PORT=8080
+ENV NGINX_ACCESS_LOG=/dev/stdout
+ENV NGINX_ERROR_LOG=/dev/stderr
 
 WORKDIR /var/www/html
 
@@ -29,7 +30,3 @@ RUN npm ci \
 # Install PHP dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev \
     && rm -rf /var/www/html/.composer/cache
-
-EXPOSE 8080
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
